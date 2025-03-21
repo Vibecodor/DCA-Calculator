@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom DCA Calculator</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6">DCA Investment Calculator with Custom Levels</h1>
+        
+        <!-- Main Setup Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold mb-4">Fund Parameters</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Total Fund Size (BTC)</label>
+                    <input
+                        type="number"
+                        id="fundSizeBTC"
+                        value="200"
+                        class="w-full p-2 border rounded"
+                    />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Preferred Allocation (%)</label>
+                    <input
+                        type="number"
+                        id="preferredAllocation"
+                        value="4.2"
+                        step="0.1"
+                        class="w-full p-2 border rounded"
+                    />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">BTC Price (USD)</label>
+                    <input
+                        type="number"
+                        id="btcPrice"
+                        value="70000"
+                        class="w-full p-2 border rounded"
+                    />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Exponential Factor</label>
+                    <input
+                        type="number"
+                        id="exponentialFactor"
+                        value="1.5"
+                        step="0.1"
+                        class="w-full p-2 border rounded"
+                    />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Number of Levels</label>
+                    <input
+                        type="number"
+                        id="levelCount"
+                        value="6"
+                        min="2"
+                        max="20"
+                        class="w-full p-2 border rounded"
+                    />
+                </div>
+                <div class="flex items-end">
+                    <button 
+                        id="generateLevelsBtn" 
+                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    >
+                        Generate Level Inputs
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Price Levels Input -->
+        <div id="priceLevelsContainer" class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold mb-4">Price Levels</h2>
+            <p class="text-sm text-gray-600 mb-4">Enter your target price levels from highest to lowest:</p>
+            
+            <div id="priceLevelInputs" class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-4">
+                <!-- Price level inputs will be generated here -->
+            </div>
+            
+            <button 
+                id="calculateBtn" 
+                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            >
+                Calculate Investment Levels
+            </button>
+        </div>
+        
+        <!-- Summary Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold mb-4">Summary</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-500">Total Investment (BTC)</h3>
+                    <p id="totalInvestment" class="text-2xl font-bold">0</p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-500">Total Tokens</h3>
+                    <p id="totalTokens" class="text-2xl font-bold">0</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-500">Average Price</h3>
+                    <p id="averagePrice" class="text-2xl font-bold">0</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Levels Table -->
+        <div class="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
+            <h2 class="text-xl font-semibold mb-4">Investment Levels</h2>
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
+                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Distance</th>
+                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exponent</th>
+                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Weight</th>
+                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Allocation (BTC)</th>
+                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Investment (USD)</th>
+                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tokens</th>
+                    </tr>
+                </thead>
+                <tbody id="levelsTableBody" class="bg-white divide-y divide-gray-200">
+                    <!-- Table rows will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Export Section -->
+        <div class="mt-6 text-center">
+            <button 
+                id="exportCsvBtn" 
+                class="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
+            >
+                Export as CSV
+            </button>
+        </div>
+
+        <div class="text-xs text-gray-500 mt-4 text-center">
+            DCA Calculator - For Notion Embedding
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const generateLevelsBtn = document.getElementById('generateLevelsBtn');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const exportCsvBtn = document.getElementById('exportCsvBtn');
+            const priceLevelInputs = document.getElementById('priceLevelInputs');
+            
+            // Add event listeners
+            generateLevelsBtn.addEventListener('click', generatePriceLevelInputs);
+            calculateBtn.addEventListener('click', calculateLevels);
+            exportCsvBtn.addEventListener('click', exportToCsv);
+            
+            // Initially generate some level inputs
+            generatePriceLevelInputs();
+            
+            // Format number for display
+            function formatNumber(num, decimals = 8) {
+                if (num === undefined || num === null) return '-';
+                return num.toLocaleString('en-US', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: decimals
+                });
+            }
+            
+            // Generate price level input fields
+            function generatePriceLevelInputs() {
+                const levelCount = parseInt(document.getElementById('levelCount').value);
+                priceLevelInputs.innerHTML = '';
+                
+                for (let i = 0; i < levelCount; i++) {
+                    const inputDiv = document.createElement('div');
+                    
+                    const label = document.createElement('label');
+                    label.className = 'block text-sm font-medium text-gray-700 mb-1';
+                    label.textContent = `Level ${i + 1} Price`;
+                    
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.id = `priceLevel${i}`;
+                    input.className = 'w-full p-2 border rounded';
+                    input.step = '0.00000001';
+                    
+                    // Pre-fill with sample values (descending)
+                    if (i === 0) {
+                        input.value = '0.00036';
+                    } else if (i === levelCount - 1) {
+                        input.value = '0.00017';
+                    } else {
+                        const highValue = 0.00036;
+                        const lowValue = 0.00017;
+                        const step = (highValue - lowValue) / (levelCount - 1);
+                        input.value = (highValue - (step * i)).toFixed(8);
+                    }
+                    
+                    inputDiv.appendChild(label);
+                    inputDiv.appendChild(input);
+                    priceLevelInputs.appendChild(inputDiv);
+                }
+            }
+            
+            // Calculate DCA levels
+            function calculateLevels() {
+                // Get fund parameters
+                const fundSizeBTC = parseFloat(document.getElementById('fundSizeBTC').value);
+                const preferredAllocation = parseFloat(document.getElementById('preferredAllocation').value) / 100;
+                const btcPrice = parseFloat(document.getElementById('btcPrice').value);
+                const exponentialFactor = parseFloat(document.getElementById('exponentialFactor').value);
+                const levelCount = parseInt(document.getElementById('levelCount').value);
+                
+                // Get price levels
+                let priceLevels = [];
+                for (let i = 0; i < levelCount; i++) {
+                    const priceInput = document.getElementById(`priceLevel${i}`);
+                    if (priceInput) {
+                        priceLevels.push(parseFloat(priceInput.value));
+                    }
+                }
+                
+                // Validate inputs
+                if (priceLevels.length < 2) {
+                    alert('Please add at least 2 price levels');
+                    return;
+                }
+                
+                // Calculate max allocation
+                const totalBTC = fundSizeBTC * preferredAllocation;
+                
+                // Initialize levels array
+                let levels = [];
+                
+                // Calculate distances between levels
+                for (let i = 0; i < priceLevels.length; i++) {
+                    const price = priceLevels[i];
+                    let distance;
+                    
+                    if (i === 0) {
+                        // For the first level, use half the distance to the next level
+                        distance = (price - priceLevels[i+1]) / 2;
+                    } else if (i === priceLevels.length - 1) {
+                        // For the last level, use half the distance from the previous level
+                        distance = (priceLevels[i-1] - price) / 2;
+                    } else {
+                        // For middle levels, calculate the average of distances
+                        distance = ((priceLevels[i-1] - price) + (price - priceLevels[i+1])) / 2;
+                    }
+                    
+                    levels.push({
+                        price,
+                        distance,
+                        exponent: null,
+                        weight: null,
+                        allocation: null,
+                        investmentUSD: null,
+                        tokens: null
+                    });
+                }
+                
+                // Calculate exponents and weights
+                let totalWeight = 0;
+                
+                for (let i = 0; i < levels.length; i++) {
+                    // Calculate position ratio (0 = top, 1 = bottom)
+                    const positionRatio = i / (levels.length - 1);
+                    
+                    // Calculate exponent - higher for lower levels
+                    levels[i].exponent = Math.pow(exponentialFactor, positionRatio * levelCount);
+                    
+                    // Calculate weight
+                    levels[i].weight = levels[i].distance * levels[i].exponent;
+                    totalWeight += levels[i].weight;
+                }
+                
+                // Calculate allocations and tokens
+                let totalTokens = 0;
+                let weightedPriceSum = 0;
+                
+                for (let i = 0; i < levels.length; i++) {
+                    // Calculate BTC allocation
+                    levels[i].allocation = (levels[i].weight / totalWeight) * totalBTC;
+                    
+                    // Calculate USD value
+                    levels[i].investmentUSD = levels[i].allocation * btcPrice;
+                    
+                    // Calculate tokens
+                    levels[i].tokens = levels[i].investmentUSD / levels[i].price;
+                    
+                    totalTokens += levels[i].tokens;
+                    weightedPriceSum += levels[i].price * levels[i].tokens;
+                }
+                
+                // Calculate average price
+                const averagePrice = weightedPriceSum / totalTokens;
+                
+                // Update summary
+                document.getElementById('totalInvestment').textContent = formatNumber(totalBTC, 8);
+                document.getElementById('totalTokens').textContent = formatNumber(totalTokens, 2);
+                document.getElementById('averagePrice').textContent = formatNumber(averagePrice, 8);
+                
+                // Update table
+                const tableBody = document.getElementById('levelsTableBody');
+                tableBody.innerHTML = '';
+                
+                levels.forEach((level, idx) => {
+                    const row = document.createElement('tr');
+                    row.className = idx % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                    
+                    row.innerHTML = `
+                        <td class="px-4 py-2">${idx + 1}</td>
+                        <td class="px-4 py-2">${formatNumber(level.price, 8)}</td>
+                        <td class="px-4 py-2">${formatNumber(level.distance, 8)}</td>
+                        <td class="px-4 py-2">${formatNumber(level.exponent, 4)}</td>
+                        <td class="px-4 py-2">${formatNumber(level.weight, 8)}</td>
+                        <td class="px-4 py-2">${formatNumber(level.allocation, 8)}</td>
+                        <td class="px-4 py-2">${formatNumber(level.investmentUSD, 2)}</td>
+                        <td class="px-4 py-2">${formatNumber(level.tokens, 2)}</td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+                
+                // Store levels for export
+                window.calculatedLevels = levels;
+            }
+            
+            // Export results to CSV
+            function exportToCsv() {
+                if (!window.calculatedLevels || window.calculatedLevels.length === 0) {
+                    alert('Please calculate levels first');
+                    return;
+                }
+                
+                const headers = ['Level', 'Price', 'Distance', 'Exponent', 'Weight', 'Allocation (BTC)', 'Investment (USD)', 'Tokens'];
+                const rows = window.calculatedLevels.map((level, idx) => [
+                    idx + 1,
+                    level.price,
+                    level.distance,
+                    level.exponent,
+                    level.weight,
+                    level.allocation,
+                    level.investmentUSD,
+                    level.tokens
+                ]);
+                
+                // Add summary row
+                const totalTokens = window.calculatedLevels.reduce((sum, level) => sum + level.tokens, 0);
+                const totalInvestment = window.calculatedLevels.reduce((sum, level) => sum + level.allocation, 0);
+                const weightedPriceSum = window.calculatedLevels.reduce((sum, level) => sum + (level.price * level.tokens), 0);
+                const averagePrice = weightedPriceSum / totalTokens;
+                
+                rows.push([]);
+                rows.push(['Summary']);
+                rows.push(['Total Investment (BTC)', totalInvestment]);
+                rows.push(['Total Tokens', totalTokens]);
+                rows.push(['Average Price', averagePrice]);
+                
+                // Create CSV content
+                let csvContent = headers.join(',') + '\n';
+                rows.forEach(row => {
+                    csvContent += row.join(',') + '\n';
+                });
+                
+                // Create download link
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'dca_levels.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+    </script>
+</body>
+</html>
